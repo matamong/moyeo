@@ -3,7 +3,7 @@ from starlette import status
 from typing import List
 
 from app.schemas.dates import UserSchedules
-from app.utils import find_most_overlapping_date
+from app.utils import find_most_overlapping_dates
 
 router = APIRouter()
 
@@ -19,6 +19,5 @@ def get_most_overlapping_date(request: UserSchedules):
         for d in schedule.dates:
             dates.append(d)
 
-    most_overlap = find_most_overlapping_date(dates=dates)
-    
-    return f"The date with the most overlap is {most_overlap}"
+    most_overlaps = find_most_overlapping_dates(dates=dates)
+    return {"result": most_overlaps}
