@@ -15,15 +15,13 @@ def find_most_overlapping_date(dates: List[date]):
                 overlap_counts[d] = 1
     
     most_overlap = max(overlap_counts, key=overlap_counts.get)
-    # sorted_dates = sorted(overlap_counts, key=overlap_counts.get, reverse=True)
-    sorted_dates = dict(sorted(overlap_counts.items(), key=lambda item: item[1], reverse=True))
 
     # Find the key and value with the largest integer value
     max_key = most_overlap
     max_value = overlap_counts[max_key]
     keys_with_max_value = []
 
-    for key, value in sorted_dates.items():
+    for key, value in overlap_counts.items():
         if value > max_value:
             max_key = key
             max_value = value
@@ -32,5 +30,7 @@ def find_most_overlapping_date(dates: List[date]):
             keys_with_max_value.append(key)
 
     print(keys_with_max_value, max_value)
+
+    print(type(keys_with_max_value))
 
     return most_overlap
