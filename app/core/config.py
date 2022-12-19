@@ -9,7 +9,7 @@ from app.core.settings.production import ProdAppSettings
 from app.core.settings.test import TestAppSettings
 
 
-enviroments: Dict[AppEnvTypes, Type[AppSettings]] = {
+environment: Dict[AppEnvTypes, Type[AppSettings]] = {
     AppEnvTypes.dev: DevAppSettings,
     AppEnvTypes.prod: ProdAppSettings,
     AppEnvTypes.test: TestAppSettings,
@@ -19,5 +19,5 @@ enviroments: Dict[AppEnvTypes, Type[AppSettings]] = {
 @lru_cache
 def get_app_settings() -> AppSettings:
     app_env = BaseAppSettings().app_env
-    config = enviroments[app_env]
+    config = environment[app_env]
     return config()
