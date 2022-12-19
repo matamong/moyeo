@@ -6,5 +6,11 @@
 <br>
 
 ## Stack (So far...)
-- Python11.1
-- FastAPI
+- Python 11.1
+- FastAPI 0.88
+- Postgresql 15
+
+## Used
+- SQLAlchemy
+- Alembic
+- uvicorn
