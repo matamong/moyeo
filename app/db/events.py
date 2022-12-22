@@ -1,10 +1,12 @@
 import asyncpg
 from fastapi import FastAPI
 
-from app.core.settings.app import AppSettings
+from app.core.config import get_app_settings
+
+APP_SETTINGS = get_app_settings()
 
 
-async def connect_to_db(app: FastAPI, settings: AppSettings) -> None:
+async def connect_to_db(app: FastAPI, settings: APP_SETTINGS) -> None:
     app.state.pool = await asyncpg.create_pool(
         str(settings.database_url),
         min_size=settings.min_connection_count,
