@@ -6,8 +6,8 @@ from pydantic import BaseSettings, AnyHttpUrl, validator, HttpUrl, PostgresDsn
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    # ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 60m * 24h * 8d = 8days
+    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 60m * 24h * 8d = 8days
     # SERVER_NAME: str
     # SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
@@ -54,6 +54,10 @@ class Settings(BaseSettings):
             host=values.get("POSTGRES_SERVER"),
             path=f"/{values.get('POSTGRES_DB') or ''}"
         )
+
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_OAUTH_REDIRECT_URI: str
 
     class Config:
         case_sensitive = True
