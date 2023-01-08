@@ -1,109 +1,13 @@
-import datetime
-from typing import Optional, List
 from urllib.parse import urlencode
-
-from jose import jwt
-import httpx
-from pydantic import BaseModel
 
 from fastapi import APIRouter, HTTPException, Request
 from starlette.responses import RedirectResponse
 
 from app.core.config import settings
+from app.core.security import get_access_token, get_user_info, create_access_token, create_refresh_token, AUTH_BASE_URL
+from app.schemas import AccessTokenResponse, UserInfoResponse
 
 router = APIRouter()
-
-ALGORITHM = "HS256"
-AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-
-
-class AccessTokenResponse(BaseModel):
-    access_token: str
-    token_type: str
-    expires_in: int
-    refresh_token: str | None
-    scope: str
-
-
-class UserInfoResponse(BaseModel):
-    id: str
-    name: str
-    given_name: str
-    family_name: str
-    picture: str
-    email: str
-    verified_email: bool
-    locale: str
-
-
-def create_access_token(
-        subject: str,
-        expire_delta: Optional[datetime.timedelta] = None,
-        **kwargs
-):
-    if expire_delta:
-        expire = datetime.datetime.utcnow() + expire_delta
-    else:
-        expire = datetime.datetime.utcnow() + datetime.timedelta(settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {
-        "exp": expire,
-        "sub": subject,
-        **kwargs
-    }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
-
-
-def create_refresh_token(
-        subject: str,
-        expires_delta: Optional[datetime.timedelta] = None,
-        **kwargs,
-):
-    if expires_delta:
-        expire = datetime.datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.datetime.utcnow() + datetime.timedelta(days=15)
-
-    payload = {
-        "exp": expire,
-        "sub": subject,
-        **kwargs
-    }
-
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
-
-
-def get_access_token(code: str):
-    """
-    Exchange the authorization code for an access token
-    """
-    params = {
-        "client_id": settings.GOOGLE_CLIENT_ID,
-        "client_secret": settings.GOOGLE_CLIENT_SECRET,
-        "code": code,
-        "redirect_uri": settings.GOOGLE_OAUTH_REDIRECT_URI,
-        "grant_type": "authorization_code"
-    }
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    response = httpx.post("https://www.googleapis.com/oauth2/v4/token", data=params, headers=headers)
-    if response.status_code != 200:
-        raise HTTPException(status_code=500, detail="Error exchanging code for token")
-    return response.json()
-
-
-def get_user_info(access_token: str):
-    """Get the user's profile information from the Google API"""
-    headers = {
-        # "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": f"Bearer {access_token}",
-        # "Accept": "application/json"
-    }
-    # response = httpx.get("https://www.googleapis.com/oauth2/v4/token", headers=headers)
-    response = httpx.get("https://www.googleapis.com/oauth2/v1/userinfo", headers=headers)
-    if response.status_code != 200:
-        raise HTTPException(status_code=500, detail="Error getting user info")
-    return response.json()
 
 
 @router.get("/google/callback")
@@ -145,7 +49,7 @@ def google_auth(code: str, error: str = None):
 
 
 @router.get("/google/login")
-def login(request: Request):
+def google_login(request: Request):
     """
     Initiate the OAuth2 authorization flow
     """
