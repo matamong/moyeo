@@ -27,3 +27,27 @@ alembic revision --autogenerate -m "Initialize user entity"
 ```commandline
 alembic upgrade head
 ```
+
+
+<br><br>
+
+
+# Tip
+## How To Check PostgreSQL
+- Connect database_name
+```commandline
+\connect <database_name>
+```
+<br>
+
+- Check tables in database
+```commandline
+\d
+```
+
+<br>
+
+- Check the fields in a table
+```commandline
+\d <table_name>
+```
