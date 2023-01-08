@@ -1,4 +1,9 @@
+import sys
 import os
+
+parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
+sys.path.append(parent_dir)
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -19,6 +24,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+
 from app.db.base import Base
 
 target_metadata = Base.metadata
@@ -29,11 +35,13 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+from app.core.config import settings
+
 def get_url():
-    user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "")
-    server = os.getenv("POSTGRES_SERVER", "db")
-    db = os.getenv("POSTGRES_DB", "app")
+    user = settings.POSTGRES_USER
+    password = settings.POSTGRES_PASSWORD
+    server = settings.POSTGRES_SERVER
+    db = settings.POSTGRES_DB
     return f"postgresql://{user}:{password}@{server}/{db}"
 
 
