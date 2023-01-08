@@ -48,6 +48,10 @@ def create_refresh_token(
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 
+#######
+# Google OAuth
+#######
+
 def get_access_token(code: str):
     """
     Exchange the authorization code for an access token
@@ -72,11 +76,8 @@ def get_user_info(access_token: str):
     """Get the user's profile information from the Google API"""
 
     headers = {
-        # "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": f"Bearer {access_token}",
-        # "Accept": "application/json"
     }
-    # response = httpx.get("https://www.googleapis.com/oauth2/v4/token", headers=headers)
     response = httpx.get("https://www.googleapis.com/oauth2/v1/userinfo", headers=headers)
     if response.status_code != 200:
         raise HTTPException(status_code=500, detail="Error getting user info")

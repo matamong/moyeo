@@ -15,20 +15,19 @@ def google_auth(code: str, error: str = None):
     """
     Handle the redirect from the Google OAuth2 API
     """
-    print('here')
 
     if error:
         raise HTTPException(status_code=400, detail=error)
     token_response = get_access_token(code)
-    print(token_response)
     token_response_model = AccessTokenResponse(**token_response)
 
     user_info = get_user_info(token_response_model.access_token)
-    print(user_info)
     user_info_model = UserInfoResponse(**user_info)
 
-    print(user_info_model)
 
+    ###
+    # User save function is here.
+    ###
     # user = User.get(email=user_info_model.email)
     #
     # if not user:
