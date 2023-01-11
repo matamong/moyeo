@@ -15,6 +15,10 @@ class UserCreate(UserBase):
     nickname: str
 
 
+class UserUpdate(UserBase):
+    nickname: Optional[str] = None
+
+
 class UserInDBBase(UserBase):
     id: Optional[int] = None
 
