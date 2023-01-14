@@ -33,7 +33,7 @@ def find_most_overlapping_dates(dates: List[date]):
     return keys_with_max_value
 
 
-def find_most_overlapping_datetimes(datetimes: List[str]):
+def find_most_overlapping_datetime(datetimes: List[str]):
     df = pd.DataFrame({'Datetime': datetimes})
     df['Datetime'] = pd.to_datetime(df['Datetime'])
     datetime_counts = df['Datetime'].value_counts()
