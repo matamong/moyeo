@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 from starlette import status
-from typing import List
 
-from app.schemas.dates import UserSchedules, DateTimeStrs
-from app.utils import find_most_overlapping_dates, find_most_overlapping_datetimes
+from app.schemas.dates import UserSchedules, DateTimeStrs, DateTimeRanges
+from app.utils import find_most_overlapping_dates, find_most_overlapping_datetimes, find_available_intersection_datetime
 
 router = APIRouter()
 
@@ -32,3 +31,13 @@ def get_most_overlapping_date(request: UserSchedules):
 def get_available_date_time(request: DateTimeStrs):
     most_overlaps = find_most_overlapping_datetimes(request.date_time)
     return {"result": most_overlaps}
+
+
+@router.post(
+    "/interval",
+    name="demo: find-most-interval-date-and-time",
+    tags=["demo"]
+)
+def get_interval_datetime(request: DateTimeRanges):
+    interval_datetime = find_available_intersection_datetime(request.date_time_ranges)
+    return {"result": interval_datetime}

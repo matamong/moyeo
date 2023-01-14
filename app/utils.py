@@ -1,5 +1,6 @@
+import functools
 from datetime import date, datetime
-from typing import List
+from typing import List, Tuple
 import pandas as pd
 
 
@@ -38,4 +39,25 @@ def find_most_overlapping_datetimes(datetimes: List[str]):
     datetime_counts = df['Datetime'].value_counts()
     most_overlapping_datetime = datetime_counts.idxmax()
     return most_overlapping_datetime
+
+
+def interval_overlap(interval1, interval2):
+    start = max(interval1[0], interval2[0])
+    end = min(interval1[1], interval2[1])
+    if start <= end:
+        return start, end
+    else:
+        return None
+
+
+def find_available_intersection_datetime(datetime_rages: List[Tuple[str, str]]):
+    datetime_ranges = [
+        (datetime.strptime(start, '%Y-%m-%d %H:%M'),
+         datetime.strptime(end, '%Y-%m-%d %H:%M'))
+        for start, end in datetime_rages
+    ]
+    available_interval = functools.reduce(interval_overlap, datetime_ranges)
+    if available_interval is None:
+        return []
+    return available_interval
 
