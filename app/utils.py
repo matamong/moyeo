@@ -1,5 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
+import pandas as pd
+
 
 def find_most_overlapping_dates(dates: List[date]):
     start_date = min(dates)  
@@ -28,3 +30,12 @@ def find_most_overlapping_dates(dates: List[date]):
             keys_with_max_value.append(key)
     
     return keys_with_max_value
+
+
+def find_most_overlapping_datetimes(datetimes: List[str]):
+    df = pd.DataFrame({'Datetime': datetimes})
+    df['Datetime'] = pd.to_datetime(df['Datetime'])
+    datetime_counts = df['Datetime'].value_counts()
+    most_overlapping_datetime = datetime_counts.idxmax()
+    return most_overlapping_datetime
+
