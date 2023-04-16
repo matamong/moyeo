@@ -1,9 +1,10 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
-
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app.db.base_class import Base
 
@@ -64,6 +65,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def remove(self, db: Session, *, id: int) -> ModelType:
         obj = db.query(self.model).get(id)
+        if obj is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is No such thing.")
         db.delete(obj)
         db.commit()
         return obj

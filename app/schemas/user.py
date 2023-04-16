@@ -3,13 +3,14 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 
-# Shared Properties
+# Shared Properties (Optional types)
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
     nickname: Optional[str] = None
 
 
+# Redefine required types
 class UserCreate(UserBase):
     email: EmailStr
     nickname: str

@@ -59,6 +59,8 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str
     GOOGLE_OAUTH_REDIRECT_URI: str
 
+    PARTY_CODE_LENGTH: int = 6
+
     class Config:
         case_sensitive = True
         env_file = ".env"

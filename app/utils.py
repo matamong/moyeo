@@ -1,7 +1,11 @@
 import functools
+import random
+import string
 from datetime import date, datetime
 from typing import List, Tuple
 import pandas as pd
+
+from app.core.config import settings
 
 
 def find_most_overlapping_dates(dates: List[date]):
@@ -61,3 +65,6 @@ def find_available_intersection_datetime(datetime_rages: List[Tuple[str, str]]):
         return []
     return available_interval
 
+
+def generate_code(length: int = settings.PARTY_CODE_LENGTH):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
