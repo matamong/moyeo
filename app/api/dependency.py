@@ -17,6 +17,7 @@ bearer = HTTPBearer()
 
 
 def get_db() -> Generator:
+    print("db")
     try:
         db = SessionLocal()
         yield db
@@ -37,7 +38,7 @@ def get_current_user(
         )
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError) as e:
-        print(e)
+        print(e)   # TODO: erase
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
