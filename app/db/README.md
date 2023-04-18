@@ -51,3 +51,22 @@ alembic upgrade head
 ```commandline
 \d <table_name>
 ```
+
+<br>
+
+## How to reset Alembic?
+1. Undo all of our changes to our database by running command below.
+ ```commandline
+alembic downgrade base
+```
+2. Remove the `alembic_version` table.
+   - Located in alembic schema(In the same database).
+3. Remove the alembic version files.
+
+If the process in step 1 is not executed due to an error, <br>
+try in the order of step2-3-1.
+
+
+<br>
+
+[refer article](https://medium.com/@peytonrunyan/alembic-101-897f322c9334)
