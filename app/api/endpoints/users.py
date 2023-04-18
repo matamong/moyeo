@@ -10,29 +10,13 @@ from app.api import dependency
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
-def read_users(
-        db: Session = Depends(dependency.get_db),
-        skip: int = 0,
-        limit: int = 100,
-) -> Any:
-    users = crud.user.get_multi(db, skip=skip, limit=limit)
-    return users
 
-
-@router.get("/{user_id}", response_model=schemas.User)
-def read_user_by_id(
-        user_id: int,
-        db: Session = Depends(dependency.get_db),
-) -> Any:
-    user = crud.user.get(db, id=user_id)
-    return user
-
-
-@router.get("/me", response_model=schemas.UserInDB)
+@router.get("/me", response_model=schemas.User)
 def read_user_me(
+        db: Session = Depends(dependency.get_db),
         current_user: models.User = Depends(dependency.get_current_user)
 ) -> Any:
+    print("2")
     return current_user
 
 
@@ -60,3 +44,25 @@ def delete_user_me(
     user = crud.user.remove(db, id=int(current_user.id))
     return user
 
+
+@router.get("/", response_model=List[schemas.User])
+def read_users(
+        db: Session = Depends(dependency.get_db),
+        skip: int = 0,
+        limit: int = 100,
+) -> Any:
+    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    return users
+
+
+@router.get("/{user_id}", response_model=schemas.User)
+def read_user_by_id(
+        user_id: int,
+        db: Session = Depends(dependency.get_db),
+) -> Any:
+    user = crud.user.get(db, id=user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=400, detail="Not Found"
+        )
+    return user
