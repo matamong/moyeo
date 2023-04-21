@@ -41,6 +41,10 @@ def read_party_by_id(
         db: Session = Depends(dependency.get_db),
 ) -> Any:
     party = crud.party.get(db, id=party_id)
+    if party is None:
+        raise  HTTPException(
+            status_code=400, detail="Party ot Found"
+        )
     return party
 
 
@@ -71,6 +75,8 @@ def read_party_by_code(
         db: Session = Depends(dependency.get_db),
 ) -> Any:
     party = crud.party.get_by_code(db, code=party_code)
+    if party is None:
+        raise HTTPException(status_code=400, detail="Party Not Found")
     return party
 
 
