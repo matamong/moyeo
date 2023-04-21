@@ -61,4 +61,5 @@ def google_login(request: Request):
         "redirect_uri": settings.GOOGLE_OAUTH_REDIRECT_URI
     }
     auth_url = f"{AUTH_BASE_URL}?{urlencode(params)}"
+    print(auth_url)
     return RedirectResponse(auth_url)
