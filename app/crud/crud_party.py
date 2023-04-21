@@ -50,14 +50,13 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
         obj_in_data["code"] = uuid.uuid4()
         obj_in_data["leader_id"] = leader_id
         obj_in_data["access_code"] = generate_code()
-        obj_in_data["is_manager"] = True
         nickname = obj_in_data.pop("nickname")
 
         db_obj = self.model(**obj_in_data)
         db.add(db_obj)
         db.flush()
 
-        party_user = PartyUser(user_id=leader_id, party_id=db_obj.id, nickname=nickname)
+        party_user = PartyUser(user_id=leader_id, party_id=db_obj.id, nickname=nickname, is_manager=True)
         db.add(party_user)
 
         db.commit()
@@ -71,6 +70,9 @@ class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
         obj_in_data = jsonable_encoder(obj_in)
         party_code = obj_in_data.pop("party_code")
         obj_in_data["user_id"] = user_id
+
+        for i in obj_in_data:
+            print(i)
 
         party = db.query(Party).filter(Party.id == obj_in.party_id).first()
 
