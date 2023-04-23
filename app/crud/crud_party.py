@@ -71,9 +71,6 @@ class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
         party_code = obj_in_data.pop("party_code")
         obj_in_data["user_id"] = user_id
 
-        for i in obj_in_data:
-            print(i)
-
         party = db.query(Party).filter(Party.id == obj_in.party_id).first()
 
         if party is None:
