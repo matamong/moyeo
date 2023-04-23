@@ -1,8 +1,9 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 import uuid
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 from starlette import status
@@ -39,9 +40,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
                    .limit(limit)
                    .all())
         return parties or []
-    
-    
-    # leader nickname 받아서 넣기
+
     def create_with_leader(self, db: Session, *, obj_in: PartyCreate, leader_id: int) -> Party:
         # Tip!
         # Since SQLAlchemy handles transactions through Session(by default),
@@ -89,6 +88,12 @@ class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
         db.refresh(db_obj)
 
         return db_obj
+
+    def get_by_multiple_filter(self, db: Session, *, filter_data: dict[str, Any]) -> Optional[PartyUser]:
+        query = db.query(PartyUser)
+        conditions = [getattr(PartyUser, k) == v for k, v in filter_data.items()]
+        result = query.filter(and_(*conditions)).first()
+        return result
 
     def delete(self, db: Session, *, party_id: int, user_id: int) -> PartyUser:
         party_user = db.query(PartyUser).filter_by(party_id=party_id, user_id=user_id).first()
