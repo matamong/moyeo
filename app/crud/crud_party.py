@@ -18,6 +18,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
     def get_by_code(self, db: Session, *, code: str) -> Optional[Party]:
         return db.query(Party).filter(Party.code == code).first()
 
+    # TODO Move HTTPException to api level.
     def get_by_id_with_users(self, db: Session, *, id: int) -> Optional[PartyWithPartyUser]:
         party = (
             db.query(Party)
@@ -63,6 +64,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
         return db_obj
 
 
+# TODO PartyUserCreate 랑 user_id 왜 분리됐찌 넣기
 class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
     def create_party_user(self, db: Session, *, obj_in: PartyUserCreate, user_id: int) -> PartyUser:
         # private일 때 code 필요한데 obj_in에 어케 옵셔널로 넣다뺐다하지...
