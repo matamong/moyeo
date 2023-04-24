@@ -6,6 +6,7 @@ from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
 
 
+# TODO create_random_party fixture and etc(scope=function).
 def test_create_party(db: Session) -> None:
     name = random_lower_string()
     nickname = random_lower_string()
