@@ -1,3 +1,5 @@
+from typing import Dict
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -8,6 +10,8 @@ from app.api.dependency import get_db
 from app.core.config import settings
 from app.db.base_class import Base
 from app.main import app
+from app.tests.utils.user import authentication_token_from_email
+
 SQLALCHEMY_DATABASE_URL = settings.TEST_DATABASE_URL
 
 
@@ -53,5 +57,8 @@ def client(db):
         yield c
 
 
-
-
+@pytest.fixture(scope="function")
+def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]:
+    return authentication_token_from_email(
+        db=db, client=client, email=settings.TEST_USER_EMAIL
+    )
