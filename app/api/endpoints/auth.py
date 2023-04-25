@@ -12,7 +12,7 @@ from app import crud, models
 
 router = APIRouter()
 
-
+# TODO nickname 중복 처리 handling
 @router.get("/google/callback")
 def google_auth(
         code: str,
