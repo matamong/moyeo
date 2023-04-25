@@ -1,5 +1,6 @@
 from typing import Dict
 
+from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from app.core.config import settings
@@ -12,3 +13,9 @@ def test_get_user_me(client: TestClient, normal_user_token_headers: Dict[str, st
     assert current_user
     assert current_user["is_active"] is True
     assert current_user["email"] == settings.TEST_USER_EMAIL
+
+
+def test_create_user_existing_nickname(
+        db: Session, client: TestClient, normal_user_token_headers: Dict[str, str]
+) -> None:
+    pass
