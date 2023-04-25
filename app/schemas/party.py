@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -15,6 +16,7 @@ class PartyBase(BaseModel):
     img_path: Optional[str] = None
     leader_id: Optional[int] = None
     is_private: Optional[bool] = False
+    created_at: Optional[datetime] = None
 
 
 class PartyUserBase(BaseModel):

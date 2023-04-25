@@ -29,7 +29,19 @@ def test_get_party_by_code():
 
 
 def test_create_party(db: Session, client: TestClient, normal_user_token_headers: Dict[str, str]) -> None:
-    pass
+    data = {"name": "Foo", "nickname": "matamong"}
+    response = client.post(f"{settings.API_V1_STR}/party", headers=normal_user_token_headers, json=data)
+    content = response.json()
+    print(content)
+
+    assert response.status_code == 200
+    assert content["name"] == data["name"]
+    assert "id" in content
+    assert "leader_id" in content
+    assert "is_private" in content
+    assert "code" in content
+    assert "access_code" in content
+    assert "created_at" in content
 
 
 # TODO Super User only or leader(?) and just change is_active field
