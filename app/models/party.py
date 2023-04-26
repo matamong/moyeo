@@ -5,6 +5,7 @@ from app.db.base_class import Base
 
 
 # TODO Party 용 status 만들기(개방, 비공개(코드 필요), 폐쇄)
+# TODO is_active만들기.(지우지않게)
 # https://github.com/tiangolo/fastapi/issues/2194
 class Party(Base):
     id = Column(BigInteger, primary_key=True)
