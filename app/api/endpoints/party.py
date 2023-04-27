@@ -62,6 +62,7 @@ def read_party_with_users(
         img_path=db_obj.img_path,
         leader_id=db_obj.leader_id,
         is_private=db_obj.is_private,
+        created_at=db_obj.created_at,
         party_user_set=[
             schemas.PartyUser(id=c.id, nickname=c.nickname, is_manager=c.is_manager) for c in db_obj.party_user_set
         ]
@@ -90,7 +91,9 @@ def create_party(
     party = crud.party.create_with_leader(db, obj_in=party_in, leader_id=current_user.id)
     return party
 
+
 # TODO Should deleted only by leader
+# TODO Don't remove just change is_active field
 @router.delete("/{party_id}", response_model=schemas.Party)
 def delete_party(
         *,

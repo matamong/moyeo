@@ -1,8 +1,9 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 import uuid
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 from starlette import status
@@ -17,6 +18,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
     def get_by_code(self, db: Session, *, code: str) -> Optional[Party]:
         return db.query(Party).filter(Party.code == code).first()
 
+    # TODO Move HTTPException to api level.
     def get_by_id_with_users(self, db: Session, *, id: int) -> Optional[PartyWithPartyUser]:
         party = (
             db.query(Party)
@@ -39,9 +41,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
                    .limit(limit)
                    .all())
         return parties or []
-    
-    
-    # leader nickname 받아서 넣기
+
     def create_with_leader(self, db: Session, *, obj_in: PartyCreate, leader_id: int) -> Party:
         # Tip!
         # Since SQLAlchemy handles transactions through Session(by default),
@@ -50,14 +50,13 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
         obj_in_data["code"] = uuid.uuid4()
         obj_in_data["leader_id"] = leader_id
         obj_in_data["access_code"] = generate_code()
-        obj_in_data["is_manager"] = True
         nickname = obj_in_data.pop("nickname")
 
         db_obj = self.model(**obj_in_data)
         db.add(db_obj)
         db.flush()
 
-        party_user = PartyUser(user_id=leader_id, party_id=db_obj.id, nickname=nickname)
+        party_user = PartyUser(user_id=leader_id, party_id=db_obj.id, nickname=nickname, is_manager=True)
         db.add(party_user)
 
         db.commit()
@@ -65,6 +64,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
         return db_obj
 
 
+# TODO PartyUserCreate 랑 user_id 왜 분리됐찌 넣기
 class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
     def create_party_user(self, db: Session, *, obj_in: PartyUserCreate, user_id: int) -> PartyUser:
         # private일 때 code 필요한데 obj_in에 어케 옵셔널로 넣다뺐다하지...
@@ -90,6 +90,12 @@ class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
         db.refresh(db_obj)
 
         return db_obj
+
+    def get_by_multiple_filter(self, db: Session, *, filter_data: dict[str, Any]) -> Optional[PartyUser]:
+        query = db.query(PartyUser)
+        conditions = [getattr(PartyUser, k) == v for k, v in filter_data.items()]
+        result = query.filter(and_(*conditions)).first()
+        return result
 
     def delete(self, db: Session, *, party_id: int, user_id: int) -> PartyUser:
         party_user = db.query(PartyUser).filter_by(party_id=party_id, user_id=user_id).first()
