@@ -1,27 +1,21 @@
-from fastapi.testclient import TestClient
+from typing import Dict
+
 from sqlalchemy.orm import Session
+from starlette.testclient import TestClient
 
 from app.core.config import settings
 
 
-def test(client: TestClient, db: Session) -> None:
-    response = client.get(f"{settings.API_V1_STR}/hello")
-    content = response.json()
+def test_get_user_me(client: TestClient, normal_user_token_headers: Dict[str, str]) -> None:
+    r = client.get(f"{settings.API_V1_STR}/users/me", headers=normal_user_token_headers)
+    current_user = r.json()
+
+    assert current_user
+    assert current_user["is_active"] is True
+    assert current_user["email"] == settings.TEST_USER_EMAIL
 
 
-###
-# TDD ing...
-###
-# def test_create_user(
-#         client: TestClient, db: Session
-# ) -> None:
-#     data = {"email": "matamong@matamong.com", "nickname": "matamong_is_awsome"}
-#     response = client.post(
-#         f"{settings.API_V1_STR}/users/",
-#         json=data,
-#     )
-#     assert response.status_code == 200
-#     content = response.json()
-#     assert content["email"] == data["email"]
-#     assert content["nickname"] == data["email"]
-#     assert "id" in content
+def test_create_user_existing_nickname(
+        db: Session, client: TestClient, normal_user_token_headers: Dict[str, str]
+) -> None:
+    pass
