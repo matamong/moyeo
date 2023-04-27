@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app import crud
@@ -31,9 +33,9 @@ def create_random_party_with_user(db: Session, user: User, party_nickname: str) 
     return crud.party.create_with_leader(db=db, obj_in=party_in, leader_id=user.id)
 
 
-def create_random_party_user(db: Session, party_id: int) -> PartyUser:
-    user = create_random_user(db=db)
+def create_random_party_user(db: Session, party_id: int, user: Optional[User] = None) -> PartyUser:
+    if user is None:
+        user = create_random_user(db=db)
     nickname = random_lower_string()
     party_user_in = PartyUserCreate(party_id=party_id, nickname=nickname)
     return crud.party_user.create_party_user(db=db, obj_in=party_user_in, user_id=user.id)
-

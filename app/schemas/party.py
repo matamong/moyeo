@@ -19,14 +19,6 @@ class PartyBase(BaseModel):
     created_at: Optional[datetime] = None
 
 
-class PartyUserBase(BaseModel):
-    id: Optional[int] = None
-    user_id: Optional[int] = None
-    party_id: Optional[int] = None
-    is_manager: Optional[bool] = False
-    nickname: Optional[str] = None
-
-
 class PartyCreate(BaseModel):
     name: str
     nickname: str
@@ -53,6 +45,14 @@ class Party(PartyInDBBase):
 ##############
 # PartyUser
 #############
+
+class PartyUserBase(BaseModel):
+    id: Optional[int] = None
+    # user_id: Optional[int] = None
+    party_id: Optional[int] = None
+    is_manager: Optional[bool] = False
+    nickname: Optional[str] = None
+
 
 class PartyUserCreate(PartyUserBase):
     party_id: int

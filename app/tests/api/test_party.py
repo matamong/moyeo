@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from app.core.config import settings
-from app.schemas import PartyCreate
 from app.tests.utils.party import create_random_party_with_user, create_random_party_with_random_user, \
     create_random_party_user
 from app.tests.utils.user import create_random_user, authentication_token_from_email
@@ -141,10 +140,48 @@ def test_delete_my_party():
     pass
 
 
-def test_join_party():
+"""
+# Party User
+"""
+
+
+# TODO
+def test_get_party_user(db: Session, client: TestClient) -> None:
     pass
 
 
-def test_withdraw_party():
+def test_join_party(db: Session, client: TestClient) -> None:
+    party = create_random_party_with_random_user(db=db)
+    user = create_random_user(db=db)
+    headers = authentication_token_from_email(db=db, client=client, email=user.email)
+    nickname = random_lower_string()
+    data = {"party_id": party.id, "nickname": nickname}
+    response = client.post(f"{settings.API_V1_STR}/party/join", headers=headers, json=data)
+    content = response.json()
+
+    assert response.status_code == 200
+    assert "id" in content
+    assert content["party_id"] == party.id
+    assert content["is_manager"] is False
+    assert content["nickname"] == nickname
+
+
+def test_withdraw_party_user(db: Session, client: TestClient) -> None:
+    party = create_random_party_with_random_user(db=db)
+    user = create_random_user(db=db)
+    party_user = create_random_party_user(db=db, party_id=party.id, user=user)
+
+    headers = authentication_token_from_email(db=db, client=client, email=user.email)
+    response = client.delete(f"{settings.API_V1_STR}/party/withdraw/{party.id}", headers=headers)
+    content = response.json()
+    assert response.status_code == 200
+    assert content["id"] == party_user.id
+    assert content["party_id"] == party.id
+    assert content["is_manager"] is False
+    assert content["nickname"] == party_user.nickname
+
+
+# TODO
+def test_withdraw_party_if_only_user_is_leader(db: Session, client: TestClient) -> None:
     pass
 
