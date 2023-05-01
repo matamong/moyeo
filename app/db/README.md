@@ -26,8 +26,9 @@ alembic revision --autogenerate -m "Initialize user entity"
 - Apply these changes to the database!
 ```commandline
 alembic upgrade head
+alembic -x dbname=test upgrade head <- For test DB
 ```
-
+*`-x dbname={name}` Connect the db matching the name. Set it up in `env.py`.*
 
 <br><br>
 
@@ -70,3 +71,31 @@ try in the order of step2-3-1.
 <br>
 
 [refer article](https://medium.com/@peytonrunyan/alembic-101-897f322c9334)
+
+<br>
+
+## How to downgrade Alembic?
+### Downgrade to last version.
+```commandline
+alembic downgrade -1
+```
+
+<br>
+
+### Downgrade to specific version
+1. View history
+```commandline
+alembic history 
+```
+
+2. Name the specific migration.
+```commandline
+alembic downgrade <migration-number>
+```
+
+<br>
+
+# Errors
+
+## When `upgrade head` after `downgrade base`, relation already exists
+- Delete All the exist table and retry `upgrade head`
