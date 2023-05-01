@@ -1,5 +1,7 @@
+import argparse
 import sys
 import os
+from typing import Optional
 
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), ".."))
 sys.path.append(parent_dir)
@@ -37,12 +39,25 @@ target_metadata = Base.metadata
 
 from app.core.config import settings
 
+
+def get_db_name_from_args() -> Optional[str]:
+    if context.get_x_argument(as_dictionary=True).get('dbname'):
+        return context.get_x_argument(as_dictionary=True)['dbname']
+    else:
+        return None
+
+
 def get_url():
-    user = settings.POSTGRES_USER
-    password = settings.POSTGRES_PASSWORD
-    server = settings.POSTGRES_SERVER
-    db = settings.POSTGRES_DB
-    return f"postgresql://{user}:{password}@{server}/{db}"
+    db_name = get_db_name_from_args()
+    if db_name == 'test':
+        db_url = settings.TEST_DATABASE_URL
+    else:
+        user = settings.POSTGRES_USER
+        password = settings.POSTGRES_PASSWORD
+        server = settings.POSTGRES_SERVER
+        db = settings.POSTGRES_DB
+        db_url = f"postgresql://{user}:{password}@{server}/{db}"
+    return db_url
 
 
 def run_migrations_offline() -> None:
