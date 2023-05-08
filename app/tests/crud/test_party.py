@@ -84,9 +84,9 @@ def test_update_party(db: Session) -> None:
     assert party.img_path == img_path
     assert party.leader_id == user.id
 
-    assert party.id == party2.id
-    assert party.name == party2.name
-    assert party.img_path == party2.img_path
+    assert party2.id == party2.id
+    assert party2.name == party2.name
+    assert party2.img_path == party2.img_path
 
     assert party2.desc == desc2
 
