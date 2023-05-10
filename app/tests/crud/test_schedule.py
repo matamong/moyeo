@@ -116,7 +116,7 @@ def test_get_by_id(db: Session) -> None:
     assert vote_schedule.party_id == party.id
 
 
-def test_update_vote_schedule1(db: Session) -> None:
+def test_update_vote_schedule(db: Session) -> None:
     user = create_random_user(db=db)
     party = create_random_party_with_user(db=db, user=user, party_nickname='matamong')
     party2 = crud.party.get_by_id_with_users(db=db, id=party.id)
@@ -174,3 +174,26 @@ def test_update_vote_schedule1(db: Session) -> None:
     assert len(vote_schedule2.periods['start_datetime']) == len(updated_periods['start_datetime'])
     assert len(vote_schedule2.notices['warning']) == len(updated_notices['warning'])
 
+
+def test_delete_schedule_vote(db: Session) -> None:
+    user = create_random_user(db=db)
+    party = create_random_party_with_user(db=db, user=user, party_nickname='matamong')
+    party2 = crud.party.get_by_id_with_users(db=db, id=party.id)
+    party_user = party2.party_user_set[0]
+    title = random_lower_string()
+    desc = random_lower_string()
+
+    vote_schedule_in = VoteScheduleCreate(
+        party_id=party.id,
+        manager_id=party_user.id,
+        title=title,
+        desc=desc
+    )
+
+    vote_schedule = crud.vote_schedule.create(db=db, obj_in=vote_schedule_in)
+    vote_schedule2 = crud.vote_schedule.remove(db=db, id=vote_schedule.id)
+    vote_schedule3 = crud.vote_schedule.get(db=db, id=vote_schedule.id)
+
+    assert vote_schedule3 is None
+    assert vote_schedule.id == vote_schedule2.id
+    assert vote_schedule.desc == vote_schedule2.desc
