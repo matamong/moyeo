@@ -42,25 +42,34 @@ class VoteScheduleUpdate(VoteScheduleBase):
 # ###
 # # Vote Participant
 # ###
-#
-# class VoteParticipantBase(BaseModel):
-#     id: Optional[int] = None
-#     vote_schedule_id: Optional[int] = None
-#     party_user_id: Optional[int] = None
-#     periods: Optional[Dict[str, list[datetime]]] = None
-#
-#
-# class VoteParticipantInDBBase(VoteParticipantBase):
-#     id: int
-#
-#     class Config:
-#         orm_mode = True
-#
-#
-# class VoteParticipant(VoteParticipantInDBBase):
-#     pass
-#
-#
+
+
+class VoteParticipantBase(BaseModel):
+    id: Optional[int] = None
+    vote_schedule_id: Optional[int] = None
+    party_user_id: Optional[int] = None
+    periods: Optional[Dict[str, list[str]]] = None
+
+
+class VoteParticipantCreate(VoteParticipantBase):
+    vote_schedule_id: int
+    party_user_id: int
+
+
+class VoteParticipantUpdate(VoteParticipantBase):
+    periods: Optional[Dict[str, list[str]]] = None
+
+
+class VoteParticipantInDBBase(VoteParticipantBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class VoteParticipant(VoteParticipantInDBBase):
+    pass
+
 # class VoteScheduleWithParticipants(VoteSchedule):
 #     party_user_set: list[PartyUserSimple] = []
 #

@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
 from app import crud
-from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate
+from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate, VoteParticipantCreate
 from app.tests.utils.party import create_random_party_with_user
-from app.tests.utils.schedule import create_random_vote_schedule
+from app.tests.utils.schedule import create_random_vote_schedule, create_random_vote_schedule_with_tuple
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
 
@@ -146,3 +146,24 @@ def test_delete_schedule_vote(db: Session) -> None:
     assert vote_schedule3 is None
     assert vote_schedule.id == vote_schedule2.id
     assert vote_schedule.desc == vote_schedule2.desc
+
+
+def test_create_participant(db: Session) -> None:
+    vote_schedule, party, party_user = create_random_vote_schedule_with_tuple(db=db)
+
+    periods = {
+        'start_datetime': ['2023.04.29 18:00'],
+        'end_datetime': ['2023.05.05 18:00']
+    }
+
+    vote_participant = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user.id,
+        periods=periods
+    )
+
+    vote_participant = crud.vote_participant.create(db=db, obj_in=vote_participant)
+
+    assert vote_participant.party_user_id == party_user.id
+    assert vote_participant.vote_schedule_id == vote_schedule.id
+    assert vote_participant.periods['start_datetime'][0] == periods['start_datetime'][0]
