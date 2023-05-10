@@ -167,3 +167,23 @@ def test_create_participant(db: Session) -> None:
     assert vote_participant.party_user_id == party_user.id
     assert vote_participant.vote_schedule_id == vote_schedule.id
     assert vote_participant.periods['start_datetime'][0] == periods['start_datetime'][0]
+
+
+def test_vote_participant_get_by_id(db: Session) -> None:
+    vote_schedule, party, party_user = create_random_vote_schedule_with_tuple(db=db)
+    periods = {
+        'start_datetime': ['2023.04.29 18:00'],
+        'end_datetime': ['2023.05.05 18:00']
+    }
+
+    vote_participant = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user.id,
+        periods=periods
+    )
+    vote_participant = crud.vote_participant.create(db=db, obj_in=vote_participant)
+    db_obj = crud.vote_participant.get(db=db, id=vote_participant.id)
+
+    assert vote_participant.id == db_obj.id
+    assert vote_participant.party_user_id == db_obj.party_user_id
+    assert vote_participant.vote_schedule_id == db_obj.vote_schedule_id
