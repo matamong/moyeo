@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app import crud
-from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate, VoteParticipantCreate
+from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate, VoteParticipantCreate, VoteParticipantUpdate
 from app.tests.utils.party import create_random_party_with_user
 from app.tests.utils.schedule import create_random_vote_schedule, create_random_vote_schedule_with_tuple
 from app.tests.utils.user import create_random_user
@@ -187,3 +187,31 @@ def test_vote_participant_get_by_id(db: Session) -> None:
     assert vote_participant.id == db_obj.id
     assert vote_participant.party_user_id == db_obj.party_user_id
     assert vote_participant.vote_schedule_id == db_obj.vote_schedule_id
+
+
+def test_update_vote_participant(db: Session) -> None:
+    vote_schedule, party, party_user = create_random_vote_schedule_with_tuple(db=db)
+    periods = {
+        'start_datetime': ['2023.04.29 18:00'],
+        'end_datetime': ['2023.05.05 18:00']
+    }
+
+    vote_participant = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user.id,
+        periods=periods
+    )
+    vote_participant = crud.vote_participant.create(db=db, obj_in=vote_participant)
+
+    updated_periods = {
+        'start_datetime': ['2023.04.30 14:00'],
+        'end_datetime': ['2023.05.04 14:00']
+    }
+    obj_in = VoteParticipantUpdate(
+        periods=updated_periods
+    )
+    vote_participant2 = crud.vote_participant.update(db=db, db_obj=vote_participant, obj_in=obj_in)
+
+    assert vote_participant2.id == vote_participant.id
+    assert vote_participant2.vote_schedule_id == vote_participant.vote_schedule_id
+    assert vote_participant2.periods['start_datetime'][0] == vote_participant.periods['start_datetime'][0]
