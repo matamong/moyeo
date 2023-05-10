@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate
 from app.tests.utils.party import create_random_party_with_user
+from app.tests.utils.schedule import create_random_vote_schedule
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
 
@@ -97,52 +98,14 @@ def test_create_vote_schedule_with_multiple_periods_and_notices(db: Session) -> 
 
 
 def test_get_by_id(db: Session) -> None:
-    user = create_random_user(db=db)
-    party = create_random_party_with_user(db=db, user=user, party_nickname='matamong')
-    party2 = crud.party.get_by_id_with_users(db=db, id=party.id)
-    party_user = party2.party_user_set[0]
-    title = random_lower_string()
-
-    vote_schedule_in = VoteScheduleCreate(
-        party_id=party.id,
-        manager_id=party_user.id,
-        title=title,
-    )
-    vote_schedule = crud.vote_schedule.create(db=db, obj_in=vote_schedule_in)
+    vote_schedule = create_random_vote_schedule(db=db)
 
     db_obj = crud.vote_schedule.get(db=db, id=vote_schedule.id)
 
     assert vote_schedule.id == db_obj.id
-    assert vote_schedule.party_id == party.id
 
 
 def test_update_vote_schedule(db: Session) -> None:
-    user = create_random_user(db=db)
-    party = create_random_party_with_user(db=db, user=user, party_nickname='matamong')
-    party2 = crud.party.get_by_id_with_users(db=db, id=party.id)
-    party_user = party2.party_user_set[0]
-    title = random_lower_string()
-    desc = random_lower_string()
-
-    periods = {
-        'start_datetime': ['2023.04.29 18:00'],
-        'end_datetime': ['2023.05.05 18:00']
-    }
-
-    # TODO 포맷 확실히 잡기 (프론트에서 어떻게 정제할지)
-    notices = {
-        'warning': ['주말은 꼭 모여주세요.', '모일 때 모두 음료수를 지참해주세요.']
-    }
-
-    vote_schedule_in = VoteScheduleCreate(
-        party_id=party.id,
-        manager_id=party_user.id,
-        title=title,
-        desc=desc,
-        periods=periods,
-        notices=notices
-    )
-
     updated_title = random_lower_string()
     updated_desc = random_lower_string()
     # new_manager = create_random_user(db=db) TODO VoteParticipant create
@@ -162,7 +125,7 @@ def test_update_vote_schedule(db: Session) -> None:
         notices=updated_notices
     )
 
-    vote_schedule = crud.vote_schedule.create(db=db, obj_in=vote_schedule_in)
+    vote_schedule = create_random_vote_schedule(db=db)
     vote_schedule2 = crud.vote_schedule.update(
         db=db,
         db_obj=vote_schedule,
@@ -176,21 +139,7 @@ def test_update_vote_schedule(db: Session) -> None:
 
 
 def test_delete_schedule_vote(db: Session) -> None:
-    user = create_random_user(db=db)
-    party = create_random_party_with_user(db=db, user=user, party_nickname='matamong')
-    party2 = crud.party.get_by_id_with_users(db=db, id=party.id)
-    party_user = party2.party_user_set[0]
-    title = random_lower_string()
-    desc = random_lower_string()
-
-    vote_schedule_in = VoteScheduleCreate(
-        party_id=party.id,
-        manager_id=party_user.id,
-        title=title,
-        desc=desc
-    )
-
-    vote_schedule = crud.vote_schedule.create(db=db, obj_in=vote_schedule_in)
+    vote_schedule = create_random_vote_schedule(db=db)
     vote_schedule2 = crud.vote_schedule.remove(db=db, id=vote_schedule.id)
     vote_schedule3 = crud.vote_schedule.get(db=db, id=vote_schedule.id)
 
