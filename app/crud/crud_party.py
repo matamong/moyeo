@@ -66,6 +66,9 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
 
 # TODO PartyUserCreate 랑 user_id 왜 분리됐찌 넣기
 class CRUDPartyUser(CRUDBase[PartyUser, PartyUserCreate, PartyUserUpdate]):
+    def get_by_user_id(self, db: Session, user_id: int) -> PartyUser:
+        return db.query(PartyUser).filter(PartyUser.user_id == user_id).first()
+
     def create_party_user(self, db: Session, *, obj_in: PartyUserCreate, user_id: int) -> PartyUser:
         # private일 때 code 필요한데 obj_in에 어케 옵셔널로 넣다뺐다하지...
         obj_in_data = jsonable_encoder(obj_in)
