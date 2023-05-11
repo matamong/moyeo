@@ -137,11 +137,6 @@ def test_get_by_id_with_participant(db: Session) -> None:
     vote_participant3 = crud.vote_participant.create(db=db, obj_in=vote_participant3)
     vote_schedule_with_participants = crud.vote_schedule.get_by_id_with_users(db=db, id=vote_schedule.id)
 
-    print(f'{vote_schedule_with_participants.vote_participant_set[0].party_user_id}')
-    for participant in vote_schedule_with_participants.vote_participant_set:
-        for k, v in participant.party_user.__dict__.items():
-            print(f'{k} : {v}')
-
     assert len(vote_schedule_with_participants.vote_participant_set) == 3
     assert vote_schedule_with_participants.vote_participant_set[0].party_user_id == vote_participant.party_user_id
     assert vote_schedule_with_participants.vote_participant_set[0].party_user.id == vote_participant.party_user_id
