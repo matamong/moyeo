@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate, VoteParticipantCreate, VoteParticipantUpdate
-from app.tests.utils.party import create_random_party_with_user
+from app.tests.utils.party import create_random_party_with_user, create_random_party_user
 from app.tests.utils.schedule import create_random_vote_schedule, create_random_vote_schedule_with_tuple
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
@@ -103,6 +103,55 @@ def test_get_by_id(db: Session) -> None:
     db_obj = crud.vote_schedule.get(db=db, id=vote_schedule.id)
 
     assert vote_schedule.id == db_obj.id
+
+
+def test_get_by_id_with_participant(db: Session) -> None:
+    vote_schedule, party, party_user = create_random_vote_schedule_with_tuple(db=db)
+
+    periods = {
+        'start_datetime': ['2023.04.29 18:00'],
+        'end_datetime': ['2023.05.05 18:00']
+    }
+
+    vote_participant = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user.id,
+        periods=periods
+    )
+
+    party_user2 = create_random_party_user(db=db, party_id=party.id)
+    vote_participant2 = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user2.id,
+        periods=periods
+    )
+    party_user3 = create_random_party_user(db=db, party_id=party.id)
+    vote_participant3 = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule.id,
+        party_user_id=party_user3.id,
+        periods=periods
+    )
+
+    vote_participant = crud.vote_participant.create(db=db, obj_in=vote_participant)
+    vote_participant2 = crud.vote_participant.create(db=db, obj_in=vote_participant2)
+    vote_participant3 = crud.vote_participant.create(db=db, obj_in=vote_participant3)
+    vote_schedule_with_participants = crud.vote_schedule.get_by_id_with_users(db=db, id=vote_schedule.id)
+
+    print(f'{vote_schedule_with_participants.vote_participant_set[0].party_user_id}')
+    for participant in vote_schedule_with_participants.vote_participant_set:
+        for k, v in participant.party_user.__dict__.items():
+            print(f'{k} : {v}')
+
+    assert len(vote_schedule_with_participants.vote_participant_set) == 3
+    assert vote_schedule_with_participants.vote_participant_set[0].party_user_id == vote_participant.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[0].party_user.id == vote_participant.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[0].party_user.nickname == vote_participant.party_user.nickname
+    assert vote_schedule_with_participants.vote_participant_set[1].party_user_id == vote_participant2.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[1].party_user.id == vote_participant2.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[1].party_user.nickname == vote_participant2.party_user.nickname
+    assert vote_schedule_with_participants.vote_participant_set[2].party_user_id == vote_participant3.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[2].party_user.id == vote_participant3.party_user_id
+    assert vote_schedule_with_participants.vote_participant_set[2].party_user.nickname == vote_participant3.party_user.nickname
 
 
 def test_update_vote_schedule(db: Session) -> None:

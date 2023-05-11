@@ -3,7 +3,7 @@ from typing import Optional, Dict
 
 from pydantic import BaseModel
 
-from app.schemas import PartyUserSimple
+from app.schemas import PartyUserSimple, PartyUser
 
 
 class VoteScheduleBase(BaseModel):
@@ -24,21 +24,21 @@ class VoteScheduleCreate(VoteScheduleBase):
 class VoteScheduleUpdate(VoteScheduleBase):
     pass
 
-#
-# class VoteScheduleInDBBase(VoteScheduleBase):
-#     id: int
-#     title: str
-#     party_id: int
-#     manager_id: int
-#
-#     class Config:
-#         orm_mode = True
-#
-#
-# class VoteSchedule(VoteScheduleInDBBase):
-#     pass
-#
-#
+
+class VoteScheduleInDBBase(VoteScheduleBase):
+    id: int
+    title: str
+    party_id: int
+    manager_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class VoteSchedule(VoteScheduleInDBBase):
+    pass
+
+
 # ###
 # # Vote Participant
 # ###
@@ -68,12 +68,12 @@ class VoteParticipantInDBBase(VoteParticipantBase):
 
 
 class VoteParticipant(VoteParticipantInDBBase):
+    party_user: Optional[PartyUser] = None
     pass
 
-# class VoteScheduleWithParticipants(VoteSchedule):
-#     party_user_set: list[PartyUserSimple] = []
-#
-#     class Config:
-#         orm_mode = True
-#
-#
+
+class VoteScheduleWithParticipants(VoteSchedule):
+    vote_participant_set: list[VoteParticipant] = []
+
+    class Config:
+        orm_mode = True
