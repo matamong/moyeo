@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.schemas.party import PartyCreate, PartyUpdate, PartyUserCreate
-from app.tests.utils.party import create_random_party_with_user
+from app.tests.utils.party import create_random_party_with_user, create_random_party_user
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
 
@@ -159,5 +159,9 @@ def test_get_by_user_id(db: Session) -> None:
     party = create_random_party_with_user(db=db, user=user, party_nickname=party_nickname)
     party_user = crud.party_user.get_by_user_id(db=db, party_id=party.id, user_id=user.id)
 
+    user2 = create_random_user(db=db)
+    create_random_party_user(db=db, party_id=party.id, user=user2)
+    party_user2 = crud.party_user.get_by_user_id(db=db, party_id=party.id, user_id=user2.id)
     assert party_user is not None
     assert party_user.user_id == user.id
+    assert party_user2.user_id != user.id
