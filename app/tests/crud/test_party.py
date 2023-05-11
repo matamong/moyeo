@@ -159,4 +159,5 @@ def test_get_by_user_id(db: Session) -> None:
     party = create_random_party_with_user(db=db, user=user, party_nickname=party_nickname)
     party_user = crud.party_user.get_by_user_id(db=db, party_id=party.id, user_id=user.id)
 
+    assert party_user is not None
     assert party_user.user_id == user.id
