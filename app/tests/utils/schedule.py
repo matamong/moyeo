@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.models import Party
 from app.models.party import PartyUser
-from app.models.schedule import VoteSchedule
+from app.models.schedule import VoteSchedule, VoteParticipant
 from app.schemas import PartyUserSimple
-from app.schemas.schedule import VoteScheduleCreate
+from app.schemas.schedule import VoteScheduleCreate, VoteParticipantCreate
 from app.tests.utils.party import create_random_party_with_user
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
@@ -75,3 +75,20 @@ def create_random_vote_schedule_with_tuple(
         )
 
     return crud.vote_schedule.create(db=db, obj_in=vote_schedule_in), party, party_user
+
+
+def create_vote_participant(
+        db: Session,
+        vote_schedule_id: int,
+        party_user_id: int
+) -> VoteParticipant:
+    periods = {
+        'start_datetime': ['2023.04.29 18:00'],
+        'end_datetime': ['2023.05.05 18:00']
+    }
+    obj_in = VoteParticipantCreate(
+        vote_schedule_id=vote_schedule_id,
+        party_user_id=party_user_id,
+        periods=periods
+    )
+    return crud.vote_participant.create(db=db, obj_in=obj_in)

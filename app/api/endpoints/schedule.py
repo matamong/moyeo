@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post('/', response_model=schemas.VoteSchedule)
-def create_schedule(
+def create_vote_schedule(
         *,
         db: Session = Depends(dependency.get_db),
         schedule_in: schemas.VoteScheduleCreate,
@@ -22,5 +22,23 @@ def create_schedule(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     schedule_in.manager_id = party_user.id
     vote_schedule = crud.vote_schedule.create(db=db, obj_in=schedule_in)
+
+    return vote_schedule
+
+
+# TODO with party_user 여부 확인하고 있으면 party_user도 같이 보내주기
+@router.get('/{vote_schedule_id}', response_model=schemas.VoteSchedule)
+def get_vote_schedule_by_id(
+        *,
+        db: Session = Depends(dependency.get_db),
+        vote_schedule_id: int,
+        current_user: models.User = Depends(dependency.get_current_user),
+) -> Any:
+    vote_schedule = crud.vote_schedule.get(db=db, id=vote_schedule_id)
+    if vote_schedule is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    party_user = crud.party_user.get_by_user_id(db=db, party_id=vote_schedule.party_id, user_id=current_user.id)
+    if party_user is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return vote_schedule
