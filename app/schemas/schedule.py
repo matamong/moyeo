@@ -17,7 +17,7 @@ class VoteScheduleBase(BaseModel):
 
 class VoteScheduleCreate(VoteScheduleBase):
     party_id: int
-    manager_id: int
+    # manager_id: int
     title: str
 
 
