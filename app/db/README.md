@@ -30,6 +30,8 @@ alembic -x dbname=test upgrade head <- For test DB
 ```
 *`-x dbname={name}` Connect the db matching the name. Set it up in `env.py`.*
 
+* You have to create database before use this command.*
+
 <br><br>
 
 
