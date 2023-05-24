@@ -144,4 +144,50 @@ def test_get_vote_schedule_if_manager(
     assert response.status_code == 200
     assert 'vote_participant_set' in content
     assert len(content['vote_participant_set']) == 3
+    assert 'id' in content
+    assert content['party_id'] == party.id
+    assert content['manager_id'] == party_user1.id
+    assert content['title'] == vote_schedule.title
+    assert content['desc'] == vote_schedule.desc
+    assert 'periods' in content
+    assert 'notices' in content
 
+
+def test_delete_vote_schedule_if_manager(
+    db: Session, client: TestClient, normal_user_token_headers: Dict[str, str]
+) -> None:
+    vote_schedule, party, party_user1 = create_random_vote_schedule_with_tuple(db=db)
+    vote_participant = create_vote_participant(db=db, vote_schedule_id=vote_schedule.id, party_user_id=party_user1.id)
+    # Join party_user and Update to manager
+    ###
+    party_user_data = {
+        'party_id': party.id,
+        'nickname': 'ForTest',
+        'is_manager': True
+    }
+
+    party_user_response = client.post(f'{settings.API_V1_STR}/party/join', headers=normal_user_token_headers,
+                                      json=party_user_data)
+    party_user_content = party_user_response.json()
+    party_user = crud.party_user.get(db=db, id=party_user_content['id'])
+    update_in = {
+        'is_manager': True
+    }
+    updated_party_user = crud.party_user.update(db=db, db_obj=party_user, obj_in=update_in)
+    ###
+    response = client.delete(
+        f'{settings.API_V1_STR}/vote_schedule/{vote_schedule.id}',
+        headers=normal_user_token_headers
+    )
+    content = response.json()
+
+    response2 = client.delete(
+        f'{settings.API_V1_STR}/vote_schedule/{vote_schedule.id}',
+        headers=normal_user_token_headers
+    )
+
+    party_user1_db_obj = crud.party_user.get(db=db, id=party_user1.id)
+
+    assert response.status_code == 200
+    assert response2.status_code == 404
+    assert party_user1_db_obj is not None
