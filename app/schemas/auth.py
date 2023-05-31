@@ -18,3 +18,8 @@ class UserInfoResponse(BaseModel):
     email: str
     verified_email: bool
     locale: str
+
+
+class GoogleCode(BaseModel):
+    code: str
+    error: str | None
