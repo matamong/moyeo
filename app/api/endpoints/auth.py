@@ -7,30 +7,26 @@ from starlette.responses import RedirectResponse
 from app.api import dependency
 from app.core.config import settings
 from app.core.security import get_access_token, get_user_info, create_access_token, create_refresh_token, AUTH_BASE_URL
-from app.schemas import AccessTokenResponse, UserInfoResponse, UserCreate
+from app.schemas import AccessTokenResponse, UserInfoResponse, UserCreate, GoogleCode
 from app import crud, models
 
 router = APIRouter()
 
 # TODO nickname 중복 처리 handling
-@router.get("/google/callback")
+@router.post("/google/callback")
 def google_auth(
-        code: str,
-        error: str = None,
+        code_in: GoogleCode,
         db: Session = Depends(dependency.get_db)
 ):
     """
     Handle the redirect from the Google OAuth2 API
     """
-
-    if error:
-        raise HTTPException(status_code=400, detail=error)
-    token_response = get_access_token(code)
+    if code_in.error:
+        raise HTTPException(status_code=400, detail=code_in.error)
+    token_response = get_access_token(code_in.code)
     token_response_model = AccessTokenResponse(**token_response)
-
     user_info = get_user_info(token_response_model.access_token)
     user_info_model = UserInfoResponse(**user_info)
-
     user = crud.user.get_by_email(db, email=user_info_model.email)
 
     if not user:

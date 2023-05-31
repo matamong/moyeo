@@ -69,7 +69,6 @@ def get_access_token(code: str):
     response = httpx.post("https://www.googleapis.com/oauth2/v4/token", data=params, headers=headers)
     if response.status_code != 200:
         raise HTTPException(status_code=500, detail="Error exchanging code for token")
-    print('code=', code)
     return response.json()
 
 
