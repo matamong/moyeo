@@ -37,8 +37,8 @@ def test_get_my_parties(db: Session, client: TestClient) -> None:
     assert content2[0]["desc"] == party.desc
     assert content2[0]["img_path"] == party.img_path
     assert content2[0]["leader_id"] == party.leader_id
-    assert content2[0]["code"] is not None
-    assert content2[0]["access_code"] is not None
+    assert "code" not in content2[0]
+    assert "access_code" not in content2[0]
     assert content2[0]["is_private"] is not None
     assert content2[0]["created_at"] is not None
 
@@ -54,8 +54,8 @@ def test_get_my_parties(db: Session, client: TestClient) -> None:
     assert content3[1]["desc"] == party2.desc
     assert content3[1]["img_path"] == party2.img_path
     assert content3[1]["leader_id"] == party2.leader_id
-    assert content3[1]["code"] is not None
-    assert content3[1]["access_code"] is not None
+    assert "code" not in content3[1]
+    assert "access_code" not in content3[1]
     assert content3[1]["is_private"] is not None
     assert content3[1]["created_at"] is not None
 
@@ -70,8 +70,8 @@ def test_get_party_by_id(db: Session, client: TestClient) -> None:
     assert content["name"] == party.name
     assert content["desc"] == party.desc
     assert content["img_path"] == party.img_path
-    assert content["code"] is not None
-    assert content["access_code"] is not None
+    assert "code" not in content
+    assert "access_code" not in content
     assert content["is_private"] is not None
     assert content["created_at"] is not None
 
@@ -90,8 +90,8 @@ def test_get_party_with_users(db: Session, client: TestClient) -> None:
     assert content["desc"] == party.desc
     assert content["leader_id"] == leader.id
     assert content["img_path"] == party.img_path
-    assert content["code"] is None
-    assert content["access_code"] is None
+    assert "code" not in content
+    assert "access_code" not in content
     assert content["is_private"] is not None
     assert content["created_at"] is not None
 
@@ -113,8 +113,8 @@ def test_get_party_by_code(db: Session, client: TestClient) -> None:
     assert content["name"] == party.name
     assert content["desc"] == party.desc
     assert content["img_path"] == party.img_path
-    assert content["code"] is not None
-    assert content["access_code"] is not None
+    assert "code" not in content
+    assert "access_code" not in content
     assert content["is_private"] is not None
     assert content["created_at"] is not None
 
@@ -130,8 +130,8 @@ def test_create_party(db: Session, client: TestClient, normal_user_token_headers
     assert "id" in content
     assert "leader_id" in content
     assert "is_private" in content
-    assert "code" in content
-    assert "access_code" in content
+    assert "code" not in content
+    assert "access_code" not in content
     assert "created_at" in content
 
 

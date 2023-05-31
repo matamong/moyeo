@@ -42,7 +42,7 @@ def read_party_by_id(
 ) -> Any:
     party = crud.party.get(db, id=party_id)
     if party is None:
-        raise  HTTPException(
+        raise HTTPException(
             status_code=400, detail="Party ot Found"
         )
     return party
@@ -55,19 +55,7 @@ def read_party_with_users(
         db: Session = Depends(dependency.get_db),
 ) -> Any:
     db_obj = crud.party.get_by_id_with_users(db, id=party_id)
-    party = schemas.PartyWithPartyUser(
-        id=db_obj.id,
-        name=db_obj.name,
-        desc=db_obj.desc,
-        img_path=db_obj.img_path,
-        leader_id=db_obj.leader_id,
-        is_private=db_obj.is_private,
-        created_at=db_obj.created_at,
-        party_user_set=[
-            schemas.PartyUser(id=c.id, nickname=c.nickname, is_manager=c.is_manager) for c in db_obj.party_user_set
-        ]
-    )
-    return party
+    return schemas.PartyWithPartyUser.from_orm(db_obj)
 
 
 @router.get("/code/{party_code}", response_model=schemas.Party)

@@ -11,8 +11,6 @@ class PartyBase(BaseModel):
     id: Optional[int] = None
     name: Optional[str] = None
     desc: Optional[str] = None
-    code: Optional[str] = None  # 나중에 따로 빼기
-    access_code: Optional[str] = None   # 나중에 따로 빼기
     img_path: Optional[str] = None
     leader_id: Optional[int] = None
     is_private: Optional[bool] = False
