@@ -1,6 +1,6 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Cookie
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
 from pydantic import ValidationError
@@ -13,11 +13,10 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 
 
-bearer = HTTPBearer()
+bearer = HTTPBearer(auto_error=False)
 
 
 def get_db() -> Generator:
-    print("db")
     try:
         db = SessionLocal()
         yield db
@@ -28,21 +27,31 @@ def get_db() -> Generator:
 # TODO 굳이 DB접근해서 user 객체 받아야하능가...
 def get_current_user(
         db: Session = Depends(get_db),
-        credentials: HTTPAuthorizationCredentials = Depends(bearer)
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
+        access_token: Optional[str] = Cookie(...),
 ) -> models.User:
-    if credentials is None:
-        raise HTTPException(status_code=400, detail="Not authenticated")
+
+    if credentials:
+        if credentials == 'null':
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authenticated")
+        token = credentials.credentials
+    elif access_token:
+        from_cookie = True
+        token = access_token
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authenticated")
+
     try:
         payload = jwt.decode(
-            credentials.credentials, settings.SECRET_KEY, algorithms=security.ALGORITHM
+            token, settings.SECRET_KEY, algorithms=security.ALGORITHM
         )
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError) as e:
-        print(e)   # TODO: erase
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
+
     user = crud.user.get(db, id=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
