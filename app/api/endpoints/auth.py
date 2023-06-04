@@ -70,7 +70,7 @@ def google_login(request: Request):
     return RedirectResponse(auth_url)
 
 
-@router.delete("/logout")
+@router.get("/logout")
 def logout(response: Response):
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
