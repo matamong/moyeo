@@ -76,7 +76,10 @@ def create_party(
         party_in: schemas.PartyCreate,
         current_user: models.User = Depends(dependency.get_current_user),
 ) -> Any:
-    party = crud.party.create_with_leader(db, obj_in=party_in, leader_id=current_user.id)
+    try:
+        party = crud.party.create_with_leader(db, obj_in=party_in, leader_id=current_user.id)
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="There is the duplicated value")
     return party
 
 
