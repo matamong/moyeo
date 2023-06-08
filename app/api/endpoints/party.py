@@ -22,7 +22,7 @@ def read_parties(
     return parties
 
 
-@router.get("/me", response_model=List[schemas.Party])
+@router.get("/me", response_model=List[schemas.PartyWithMe])
 def read_my_parties(
         *,
         db: Session = Depends(dependency.get_db),
@@ -31,7 +31,8 @@ def read_my_parties(
         limit: int = 100,
 ) -> Any:
     parties = crud.party.get_multiple_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
-    return parties
+    party_schemas = [schemas.PartyWithMe.from_orm(party) for party in parties]
+    return party_schemas
 
 
 # TODO : Should Super-User & The Party user only. (After setting UserStatus model)
@@ -83,6 +84,31 @@ def create_party(
     return party
 
 
+@router.put("/{party_id}", response_model=schemas.PartyUpdate)
+def update_party(
+        *,
+        db: Session = Depends(dependency.get_db),
+        party_id: int,
+        party_update_in: schemas.PartyUpdate,
+        current_user: models.User = Depends(dependency.get_current_user),
+) -> Any:
+    try:
+        db_obj = crud.party.get(db=db, id=party_id)
+        party = crud.party.update(db=db, db_obj=db_obj, obj_in=party_update_in)
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="There is the duplicatted value")
+
+    if party is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is No party")
+
+    party_user = crud.party_user.get_by_user_id(db=db, party_id=party_id, user_id=current_user.id)
+    if party_user is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    if not party_user.is_manager:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    return party
+
+
 # TODO Should deleted only by leader
 # TODO Don't remove just change is_active field
 @router.delete("/{party_id}", response_model=schemas.Party)
@@ -94,6 +120,7 @@ def delete_party(
 ) -> Any:
     party = crud.party.remove(db, id=party_id)
     return party
+
 
 """
 Party User API

@@ -1,9 +1,41 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
 from app.schemas.user import User
+
+
+class PartyUserBase(BaseModel):
+    id: Optional[int] = None
+    # user_id: Optional[int] = None
+    party_id: Optional[int] = None
+    is_manager: Optional[bool] = False
+    nickname: Optional[str] = None
+
+
+class PartyUserCreate(PartyUserBase):
+    party_id: int
+
+
+class PartyUserInDBBase(PartyUserBase):
+    id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class PartyUser(PartyUserInDBBase):
+    pass
+
+
+class PartyUserSimple(BaseModel):
+    id: int
+    nickname: str
+    is_manager: bool
+
+    class Config:
+        orm_mode = True
 
 
 # Shared Properties
@@ -40,42 +72,6 @@ class Party(PartyInDBBase):
     pass
 
 
-##############
-# PartyUser
-#############
-
-class PartyUserBase(BaseModel):
-    id: Optional[int] = None
-    # user_id: Optional[int] = None
-    party_id: Optional[int] = None
-    is_manager: Optional[bool] = False
-    nickname: Optional[str] = None
-
-
-class PartyUserCreate(PartyUserBase):
-    party_id: int
-
-
-class PartyUserInDBBase(PartyUserBase):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-
-class PartyUser(PartyUserInDBBase):
-    pass
-
-
-class PartyUserSimple(BaseModel):
-    id: int
-    nickname: str
-    is_manager: bool
-
-    class Config:
-        orm_mode = True
-
-
 class PartyWithPartyUser(Party):
     party_user_set: list[PartyUserSimple] = []
 
@@ -91,3 +87,7 @@ class PartyUserCreate(BaseModel):
 
 class PartyUserUpdate(PartyUserBase):
     pass
+
+
+class PartyWithMe(Party):
+    party_user_set: List[PartyUser] = []
