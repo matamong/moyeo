@@ -34,46 +34,6 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
     def get_multiple_by_user(
             self, db: Session, *, user_id: int, skip: int = 0, limit: int = 100
     ) -> List[Party]:
-        # parties = (db.query(self.model)
-        #            .join(PartyUser)
-        #            .filter(PartyUser.user_id == user_id)
-        #            .offset(skip)
-        #            .limit(limit)
-        #            .all())
-
-        # parties = (
-        #     db.query(Party, PartyUser)
-        #     .join(PartyUser)
-        #     .filter(PartyUser.user_id == user_id)
-        #     .offset(skip)
-        #     .limit(limit)
-        #     .all()
-        # )
-
-        # parties = (
-        #     db.query(Party)
-        #     .options(subqueryload(Party.party_user_set))
-        #     .filter(Party.party_user_set.any(user_id=user_id))
-        #     .offset(skip)
-        #     .limit(limit)
-        #     .all()
-        # )
-
-        # parties = (
-        #     db.query(Party)
-        #     .join(PartyUser)
-        #     .filter(PartyUser.user_id == user_id)
-        #     .offset(skip)
-        #     .limit(limit)
-        #     .all()
-        # )
-
-        # parties = (
-        #     db.query(Party)
-        #     .join(PartyUser)
-        #     .options()
-        # )
-
         parties = (
             db.query(self.model)
             .join(self.model.party_user_set)
