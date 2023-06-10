@@ -19,7 +19,7 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
         return db.query(Party).filter(Party.code == code).first()
 
     # TODO Move HTTPException to api level.
-    def get_by_id_with_users(self, db: Session, *, id: int) -> Optional[PartyWithPartyUser]:
+    def get_by_id_with_users(self, db: Session, *, id: int) -> Optional[Party]:
         party = (
             db.query(Party)
             .options(joinedload(Party.party_user_set))
@@ -29,8 +29,17 @@ class CRUDParty(CRUDBase[Party, PartyCreate, PartyUpdate]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Party not found")
         return party
 
-    # https://fastapi.tiangolo.com/tutorial/body-nested-models/
+    def get_by_id_with_user(self, db: Session, *, party_id: int, user_id: int) -> Optional[Party]:
+        party =(
+            db.query(self.model)
+            .join(self.model.party_user_set)
+            .filter(and_(Party.id == party_id, PartyUser.user_id == user_id, PartyUser.party_id == Party.id))
+            .options(contains_eager(self.model.party_user_set))
+            .first()
+        )
+        return party
 
+    # https://fastapi.tiangolo.com/tutorial/body-nested-models/
     def get_multiple_by_user(
             self, db: Session, *, user_id: int, skip: int = 0, limit: int = 100
     ) -> List[Party]:

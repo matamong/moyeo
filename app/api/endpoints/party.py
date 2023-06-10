@@ -35,6 +35,17 @@ def read_my_parties(
     return party_schemas
 
 
+@router.get("/me/{party_id}", response_model=schemas.PartyWithMe)
+def read_my_party(
+        *,
+        db: Session = Depends(dependency.get_db),
+        current_user: models.User = Depends(dependency.get_current_user),
+        party_id: int,
+) -> Any:
+    party = crud.party.get_by_id_with_user(db=db, party_id=party_id, user_id=current_user.id)
+    return schemas.PartyWithMe.from_orm(party)
+
+
 # TODO : Should Super-User & The Party user only. (After setting UserStatus model)
 @router.get("/{party_id}", response_model=schemas.Party)
 def read_party_by_id(
