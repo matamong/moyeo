@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -12,12 +14,12 @@ class AccessTokenResponse(BaseModel):
 class UserInfoResponse(BaseModel):
     id: str
     name: str
-    given_name: str
-    family_name: str
-    picture: str
-    email: str
+    given_name: Optional[str] = ''
+    family_name: Optional[str] = ''
+    picture: Optional[str] = ''
+    email: Optional[str] = ''
     verified_email: bool
-    locale: str
+    locale: Optional[str] = ''
 
 
 class GoogleCode(BaseModel):
