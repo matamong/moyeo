@@ -12,7 +12,14 @@ class VoteScheduleBase(BaseModel):
     desc: Optional[str] = None
     manager_id: Optional[int] = None
     periods: Optional[Dict[str, list[str]]] = None
+    # {
+    # 'start_datetime': ['2023.04.29 18:00'],
+    # 'end_datetime': ['2023.05.05 18:00']
+    # }
     notices: Optional[Dict[str, list[str]]] = None
+    # {
+    #     'warning': ['주말은 꼭 모여주세요.', '모일 때 모두 음료수를 지참해주세요.']
+    # }
 
 
 class VoteScheduleCreate(VoteScheduleBase):

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy.orm import Session, joinedload
 
@@ -11,6 +11,18 @@ from app.schemas.schedule import VoteScheduleCreate, VoteScheduleUpdate, VotePar
 
 
 class CRUDVoteSchedule(CRUDBase[VoteSchedule, VoteScheduleCreate, VoteScheduleUpdate]):
+    def get_multiple_by_party_id(
+            self, db: Session, *, party_id: int, skip: int = 0, limit: int = 100
+    ) -> List[VoteSchedule]:
+        vote_schedules = (db.query(self.model)
+                   .join(Party)
+                   .filter(Party.id == party_id)
+                   .offset(skip)
+                   .limit(limit)
+                   .all())
+
+        return vote_schedules or []
+
     def get_by_id_with_users(self, db: Session, *, id: int) -> Optional[VoteScheduleWithParticipants]:
         vote_schedule = (
             db.query(VoteSchedule)

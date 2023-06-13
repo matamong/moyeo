@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -42,6 +42,22 @@ def get_vote_schedule_by_id(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return vote_schedule
+
+
+@router.get('/party/{party_id}', response_model=List[schemas.VoteSchedule])
+def get_vote_schedule_by_party_id(
+        *,
+        db: Session = Depends(dependency.get_db),
+        party_id: int,
+        current_user: models.User = Depends(dependency.get_current_user),
+) -> Any:
+    party = crud.party.get(db=db, id=party_id)
+    if party is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    party_user = crud.party_user.get_by_user_id(db=db, party_id=party.id, user_id=current_user.id)
+    if party_user is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    return crud.vote_schedule.get_multiple_by_party_id(db=db, party_id=party_id)
 
 
 # TODO Async
