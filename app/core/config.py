@@ -7,7 +7,7 @@ from pydantic import BaseSettings, AnyHttpUrl, validator, HttpUrl, PostgresDsn
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 60m * 24h * 8d = 8days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 60m * 24h = 24h
     # SERVER_NAME: str
     # SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
