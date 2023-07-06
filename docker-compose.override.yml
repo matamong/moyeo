@@ -1,20 +1,14 @@
 services:
 
-  backend:
+  moyeo-backend:
     ports:
-      - 80:80
-    env_file:
-      - .env
+      - "80:80"
     depends_on:
       - alembic
-    
-  alembic:
-    build:
-      context: .
-      dockerifle: Dockerfile
-    env_file:
-      - .env
-    command: alembic upgrade head
+    command: /start-reload.sh
+    environment:
+      - LOG_LEVEL=debug
+      - PRE_START_PATH=/prestart.sh
 
 networks:
   traefik-public:
